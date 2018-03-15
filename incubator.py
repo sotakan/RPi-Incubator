@@ -14,17 +14,8 @@ def read_stat(): #Add any other sensors here
     return [temp,humidity]
 
 #To be used as a thread
-def update_lcd(): #This function will regulate the update interval to the lcd so it won't "blink"
-    global target_temp, str_temp, str_humid
-    while True:
-        if STOP == 1:
-            exit()
-        str_target = str(target_temp)
-        i2clcd.main_lcd(ln1 = "Temp:" + str_temp, ln2 = "Target:" + str_target)
-        time.sleep(5)
-
 #Thread this thang
-def update_sensor(): #This will update the sensor every 5 secs to avoid IOError.
+def update_sensor(): #This will update the sensor and lcd every 5 secs to avoid IOError.
     global temp, humid, str_temp, str_humid, STOP
     try:
         while True:
@@ -33,6 +24,8 @@ def update_sensor(): #This will update the sensor every 5 secs to avoid IOError.
             humid = float(round(stat[1],2)) #Rounding the float to the 2nd place
             str_temp = str(temp) #The lcd won't take tuples so we will convert them using the str() function.
             str_humid = str(humid)
+            str_target = str(target_temp)
+            i2clcd.main_lcd(ln1 = "Temp:" + str_temp, ln2 = "Target:" + str_target)
             time.sleep(5)
             if STOP == 1:
                 exit()
@@ -56,7 +49,6 @@ GPIO.setup(heatpad_pin, GPIO.OUT)
 GPIO.setup(up_switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 GPIO.setup(down_switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-threading.Thread(target=update_lcd).start()
 threading.Thread(target=update_sensor).start()
 stat = read_stat()
 temp = float(round(stat[0], 2))
