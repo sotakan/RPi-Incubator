@@ -41,16 +41,20 @@ def update_sensor(): #This will update the sensor and lcd every 5 secs to avoid 
         GPIO.cleanup()
         exit()
 
-def humidity_watch():
-    global humid, target_humid, STOP
+def watchdog():
+    global humid, target_humid, temp, target_temp, STOP
     while True:
         if STOP == 1:
             exit()
-        if humid < target_humid:
+        if humid < target_humid - 5:
             GPIO.output(spray_motor_pin, 1)
             time.sleep(5) #Spray water for 5 seconds
             GPIO.output(spray_motor_pin, 0)
-            time.sleep(180) #We will wait 2 minutes for the water to evapotate
+            time.sleep(180)
+        if temp < target_temp:
+            GPIO.output(heatpad_pin,1)
+        elif temp > target_temp:
+            GPIO.output(heatpad_pin,0)
 
 
 """
@@ -73,7 +77,7 @@ GPIO.setup(toggle_view_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 #Starting thread
 threading.Thread(target=update_sensor).start()
-threading.Thread(target=humidity_watch).start()
+threading.Thread(target=watchdog).start()
 
 try:
     while True:
@@ -97,17 +101,13 @@ try:
                 str_target_humid = str(target_humid)
                 i2clcd.main_lcd(ln1 = "Humidity:" + str_humid, ln2 = "Target:" + str_target_humid)
 
-        elif GPIO.input(toggle_view_pin) == 1 and view_mode == 0: #If it was in temperature mode
-            view_mode == 1
-            i2clcd.main_lcd(ln1 = "Humidity:" + str_humid, ln2 = "Target:" + str_target_humid)
-        elif GPIO.input(toggle_view_pin) == 1 and view_mode == 1:
-            view_mode == 0
-            i2clcd.main_lcd(ln1 = "Temp:" + str_temp, ln2 = "Target:" + str_target_temp)
-
-        if temp < target_temp:
-            GPIO.output(heatpad_pin,1)
-        elif temp > target_temp:
-            GPIO.output(heatpad_pin,0)
+        elif GPIO.input(toggle_view_pin) == 1:
+            if view_mode == 0:
+                view_mode == 1
+                i2clcd.main_lcd(ln1 = "Humidity:" + str_humid, ln2 = "Target:" + str_target_humid)
+            elif view_mode == 1:
+                view_mode == 0
+                i2clcd.main_lcd(ln1 = "Temp:" + str_temp, ln2 = "Target:" + str_target_temp)
 
 except():
     i2clcd.main_lcd(ln1 = "Incubator off", ln2 = "Error")
