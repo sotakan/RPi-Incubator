@@ -1,4 +1,6 @@
 # RPi-Incubator
+This branch only controls the temperature!
+
 Incubator controlled with a RaspberryPi
 
 Features:  
