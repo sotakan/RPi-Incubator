@@ -8,5 +8,6 @@
 |5|2|Tactile Switch|[Akizuki](http://akizukidenshi.com/catalog/g/gP-03647/)|¥10|
 |6|3|10W 10Ω Cement Resistor|[Akizuki](http://akizukidenshi.com/catalog/g/gR-03719/)|¥50|
 |7|1-|25mm Fan|[Akizuki](http://akizukidenshi.com/catalog/g/gP-02480/)|¥100|
+|8|1|I2C Controlled 16x2 LCD|Search on AliExpress|¥250-300
 
 # Costs can be significantly reduced by using OEM components on AliExpress!
