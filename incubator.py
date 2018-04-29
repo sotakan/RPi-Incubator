@@ -42,6 +42,31 @@ def update_sensor(): #This will update the sensor every 5 secs to avoid IOError.
         GPIO.cleanup()
         exit()
 
+
+def watchdog():
+    global temp, target_temp
+    while True:
+        if temp < target_temp - 0.15:
+            GPIO.output(heatpad_pin,1)
+        elif temp > target_temp - 0.14:
+            GPIO.output(heatpad_pin,0)
+        elif temp > target_temp - 0.5:
+            GPIO.output(heatpad_pin,0)
+
+        if STOP == 1:
+            break
+
+def init_heat():
+    global temp,target_temp
+    GPIO.output(heatpad_pin,1)
+    while True:
+        if temp > target_temp - 1.5:
+            GPIO.output(heatpad_pin,0)
+            time.sleep(30)
+            threading.Thread(target=watchdog).start()
+            break
+
+
 """
 Change these values to match your enviroment!
 """
@@ -57,6 +82,7 @@ GPIO.setup(down_switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 threading.Thread(target=update_lcd).start()
 threading.Thread(target=update_sensor).start()
+init_heat()
 stat = read_stat()
 temp = float(round(stat[0], 2))
 
@@ -70,10 +96,6 @@ try:
             target_temp = target_temp - 0.1
             str_target = str(target_temp)
             i2clcd.main_lcd(ln1 = "Temp:" + str_temp, ln2 = "Target:" + str_target)
-        if temp < target_temp:
-            GPIO.output(heatpad_pin,1)
-        elif temp > target_temp:
-            GPIO.output(heatpad_pin,0)
 
 except():
     i2clcd.main_lcd(ln1 = "Incubator off", ln2 = "Error")
@@ -86,4 +108,3 @@ except(KeyboardInterrupt):
     STOP = 1
     GPIO.cleanup()
     exit()
-
