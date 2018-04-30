@@ -1,6 +1,6 @@
 # RPi-Incubator
 
-## I am not responsible for anything! Use these schematics at your own risk!
+## I am not responsible for any damage to anything. Use these schematics at your own risk!
 
 ### This branch only controls the temperature!
 
