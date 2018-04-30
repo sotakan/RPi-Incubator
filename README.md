@@ -1,4 +1,7 @@
 # RPi-Incubator
+## I am not responsible for any damage to anything. Use these schematics at your own risk!
+
+
 Incubator controlled with a RaspberryPi
 
 Features:  
