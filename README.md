@@ -1,5 +1,9 @@
 # RPi-Incubator
-This branch only controls the temperature!
+
+## I am not responsible for anything! Use these schematics at your own risk!
+
+### This branch only controls the temperature!
+
 
 Incubator controlled with a RaspberryPi
 
