@@ -1,5 +1,5 @@
 # RPi-Incubator
-## I am not responsible for any damage to anything. Use these schematics at your own risk!
+## Use these schematics at your own risk!
 
 
 Incubator controlled with a RaspberryPi
@@ -14,3 +14,8 @@ BME280 (In this repository)
 
 Todo:
 Data logging  
+
+Donations are appreciated!
+https://www.amazon.jp/gp/registry/wishlist/2O0N3CM3FQTD    
+Bitcoin: 1SoTAQrztSMsR51YhNKz5Vqordr2cHCHA   
+Ether: 0xB9FB145764F6f14D8f38F15E3e51d43440943AaC
