@@ -17,6 +17,7 @@ grep -q -F "i2c-dev" /etc/modules || printf "\ni2c-dev" | sudo tee -a /etc/modul
 #Creating exec.sh
 touch exec.sh
 printf "python RPi-Incubator/incubator.py" | sudo tee exec.sh
+sudo chmod a+x exec.sh
 
 #Change hostname
 echo "Incubator-Pi" | sudo tee /etc/hostname
