@@ -15,6 +15,8 @@ class vars:
     str_temp = ""
     str_humid = ""
     STOP = 0 #Stop signal to send to looping threads
+    temp = 0
+    humid = 0
 
 def read_stat(): #Add any other sensors here
     temp,baro,humidity = bme280.readBME280All()
@@ -34,10 +36,10 @@ def update_sensor(): #This will update the sensor every 5 secs to avoid IOError.
     while True:
         try:
             stat = read_stat() #stat will retrun as a tuple
-            temp = float(round(stat[0], 2)) #Breaking down the tuples...
-            humid = float(round(stat[1],2)) #Rounding the float to the 2nd place
-            vars.str_temp = str(temp - vars.temp_offset) #The lcd won't take tuples so we will convert them using the str() function.
-            vars.str_humid = str(humid)
+            vars.temp = float(round(stat[0], 2)) #Breaking down the tuples...
+            vars.humid = float(round(stat[1],2)) #Rounding the float to the 2nd place
+            vars.str_temp = str(vars.temp - vars.temp_offset) #The lcd won't take tuples so we will convert them using the str() function.
+            vars.str_humid = str(vars.humid)
             time.sleep(5)
             if vars.STOP == 1:
                 exit()
@@ -54,7 +56,7 @@ GPIO.setup(vars.down_switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 threading.Thread(target=update_lcd).start()
 threading.Thread(target=update_sensor).start()
 stat = read_stat()
-temp = float(round(stat[0], 2))
+vars.temp = float(round(stat[0], 2))
 
 try:
     while True:
@@ -66,9 +68,9 @@ try:
             vars.target_temp = vars.target_temp - 0.1
             str_target = str(vars.target_temp - vars.temp_offset)
             i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + str_target)
-        if temp < vars.target_temp:
+        if vars.temp < vars.target_temp:
             GPIO.output(vars.heatpad_pin,1)
-        elif temp > vars.target_temp:
+        elif vars.temp > vars.target_temp:
             GPIO.output(vars.heatpad_pin,0)
 
 except():
