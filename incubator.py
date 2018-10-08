@@ -15,7 +15,7 @@ class vars:
     # Don't touch below
     str_temp = ""
     str_humid = ""
-    str_target
+    str_target = ""
     STOP = 0 #Stop signal to send to looping threads
     temp = 0
     humid = 0
