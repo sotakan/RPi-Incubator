@@ -34,7 +34,7 @@ def update_lcd(): #This function will regulate the update interval to the lcd so
                 vars.str_humid = str(vars.humid)
                 i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
                 time.sleep(5)
-    expect(IOError):
+    except(IOError):
         i2clcd.main_lcd(ln1 = "  LCD Error...", ln2 = "  Resetting...")
         sleep(2)
 
