@@ -12,8 +12,10 @@ class vars:
     heatpad_pin = 19
     up_switch_pin = 11
     down_switch_pin = 13
+    # Don't touch below
     str_temp = ""
     str_humid = ""
+    str_target = ""
     STOP = 0 #Stop signal to send to looping threads
     temp = 0
     humid = 0
@@ -24,12 +26,17 @@ def read_stat(): #Add any other sensors here
 
 #To be used as a thread
 def update_lcd(): #This function will regulate the update interval to the lcd so it won't "blink"
-    while True:
-        if vars.STOP == 1:
-            exit()
-        str_target = str(vars.target_temp)
-        i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + str_target)
-        time.sleep(5)
+    try:
+        while True:
+            if vars.STOP == 1:
+                exit()
+                vars.str_temp = str(vars.temp - vars.temp_offset) #The lcd won't take tuples so we will convert them using the str() function.
+                vars.str_humid = str(vars.humid)
+                i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
+                time.sleep(5)
+    except(IOError):
+        i2clcd.main_lcd(ln1 = "  LCD Error...", ln2 = "  Resetting...")
+        sleep(2)
 
 #Thread this thang
 def update_sensor(): #This will update the sensor every 5 secs to avoid IOError.
@@ -38,8 +45,6 @@ def update_sensor(): #This will update the sensor every 5 secs to avoid IOError.
             stat = read_stat() #stat will retrun as a tuple
             vars.temp = float(round(stat[0], 2)) #Breaking down the tuples...
             vars.humid = float(round(stat[1],2)) #Rounding the float to the 2nd place
-            vars.str_temp = str(vars.temp - vars.temp_offset) #The lcd won't take tuples so we will convert them using the str() function.
-            vars.str_humid = str(vars.humid)
             time.sleep(5)
             if vars.STOP == 1:
                 exit()
@@ -62,12 +67,12 @@ try:
     while True:
         if GPIO.input(vars.up_switch_pin) == 1:
             vars.target_temp = vars.target_temp + 0.1
-            str_target = str(vars.target_temp - vars.temp_offset)
-            i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + str_target)
+            vars.str_target = str(vars.target_temp - vars.temp_offset)
+            i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
         elif GPIO.input(vars.down_switch_pin) == 1:
             vars.target_temp = vars.target_temp - 0.1
-            str_target = str(vars.target_temp - vars.temp_offset)
-            i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + str_target)
+            vars.str_target = str(vars.target_temp - vars.temp_offset)
+            i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
         if vars.temp < vars.target_temp:
             GPIO.output(vars.heatpad_pin,1)
         elif vars.temp > vars.target_temp:
