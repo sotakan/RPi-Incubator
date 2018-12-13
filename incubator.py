@@ -30,10 +30,10 @@ def update_lcd(): #This function will regulate the update interval to the lcd so
         while True:
             if vars.STOP == 1:
                 exit()
-                vars.str_temp = str(vars.temp - vars.temp_offset) #The lcd won't take tuples so we will convert them using the str() function.
-                vars.str_humid = str(vars.humid)
-                i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
-                time.sleep(5)
+            vars.str_temp = str(vars.temp - vars.temp_offset) #The lcd won't take tuples so we will convert them using the str() function.
+            vars.str_humid = str(vars.humid)
+            i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
+            time.sleep(5)
     except(IOError):
         i2clcd.main_lcd(ln1 = "  LCD Error...", ln2 = "  Resetting...")
         sleep(2)
