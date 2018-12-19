@@ -1,4 +1,5 @@
-#Ver 0.2 dev 1
+# Ver 0.2 dev 1
+
 import bme280
 import RPi.GPIO as GPIO
 import i2clcd
