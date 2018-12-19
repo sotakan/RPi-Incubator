@@ -24,13 +24,15 @@ class variables:
     target_temp = 37.0
     # temp_offset is to eliminate any discrepancies between the sensor readings and actual readings in the box
     temp_offset = 0.0
-    # temp and humidity are here just because
+    temp_visible_offset = 0.0
+    # temp and humidity are here because global is ew
     temp = 0.0
     baro = 0.0
     humidity = 0.0
     # implement a kill signal for all looping threads
     kill_thread = False
 
+# Read sensor values and update corresponding data in class variables
 def sensor(testing = none):
     if testing == 1:
         try:
@@ -47,7 +49,12 @@ def sensor(testing = none):
         variables.humidity = float(round(humidity , 2))
         # Process offset
         variables.temp = temp - variables.temp_offset
-
+    
+def lcd():
+    while True:
+        sensor()
+        main_lcd(ln1 = "Temp: " + str(variables.temp) , ln2 = "Target:" + str(variables.target_temp))
+        
 
 
 def 
