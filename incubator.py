@@ -42,7 +42,7 @@ def sensor(testing = none):
             main_lcd(ln1 = "Init Error", ln2 = "Code 1")
             GPIO.cleanup()
             sys.exit()
-    elif:
+    else:
         temp,baro,humidity = bme280.readBME280All()
         # Round values to the 2nd place
         temp = float(round(temp , 2))
