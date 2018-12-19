@@ -1,3 +1,4 @@
+
 #Ver 0.2 dev 1
 import bme280
 import RPi.GPIO as GPIO
@@ -6,7 +7,7 @@ import sys
 import threading
 import time
 
-# I2C LCDs ship with 2 dfferent addresses depending on the lot
+# I2C LCDs ship with 2 different addresses depending on the lot
 try:
     from i2clcd_0x27 import main_lcd
 except:
@@ -59,3 +60,4 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setup(hardware.heatpad_pin, GPIO.OUT)
 GPIO.setup(hardware.up_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 GPIO.setup(hardware.down_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+>>>>>>> f25c9c18d14a8d41c1ad7d0c3fa44f010163da7a
