@@ -22,6 +22,7 @@ class hardware:
     up_switch_pin              = 11
     down_switch_pin            = 13
     error_light                = 17
+    internet_indicator         = 23
     manual_initiate_ota_update = 27
 
 class variables:
@@ -95,6 +96,7 @@ GPIO.setup(hardware.up_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 GPIO.setup(hardware.down_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 GPIO.setup(hardware.down_switch_pin, GPIO.OUT)
 GPIO.setup(hardware.manual_initiate_ota_update, GPIO.OUT)
+GPIO.setup(hardware.internet_indicator, GPIO.OUT)
 
 # Test physical connections
 sensor(testing = 1)
@@ -105,7 +107,7 @@ lcd_thread.daemon = True
 lcd_thread.start()
 
 # Wait for sensor to load
-sleep(2)
+time.sleep(2)
 
 # Main
 
@@ -125,16 +127,27 @@ try:
 
 except KeyboardInterrupt:
     variables.kill_thread = True
-    sleep(6)
+    time.sleep(6)
     lcd(custom = True, message1 = "Incubator OFF", message2 = "Manual shutdown")
     with open("temp.conf", "w") as file:
         file.write(str(variables.target_temp))
         file.close()
     GPIO.cleanup()
     sys.exit()
+
+except IOError:
+    variables.kill_thread = True
+    time.sleep(6)
+    lcd(custom = True, message1 = "Incubator OFF", message2 = "IOError")
+    with open("temp.conf", "w") as file:
+        file.write(str(variables.target_temp))
+        file.close()
+    GPIO.cleanup()
+    sys.exit()
+
 except Exception as e:
     variables.kill_thread = True
-    sleep(6)
+    time.sleep(6)
     lcd(custom = True, message1 = "Incubator OFF", message2 = "Unkwn Error")
     print "Error\nDetails:\n" , e
     with open("temp.conf", "w") as file:
