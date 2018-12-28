@@ -9,9 +9,11 @@ import time
 # I2C LCDs ship with 2 different addresses depending on the lot
 try:
     try:
-        from i2clcd_0x27 import main_lcd
+        from i2clcd_0x27 import main_lcd, lcd_init
+        lcd_init()
     except IOError:
-        from i2clcd_0x3f import main_lcd
+        from i2clcd_0x3f import main_lcd, lcd_init
+        lcd_init()
 except Exception as e:
     print "Error initializing LCD\nDetails:\n"
     sys.exit()
