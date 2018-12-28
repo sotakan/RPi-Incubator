@@ -83,7 +83,7 @@ def ota():
 try:
     with open("temp.conf", "r+") as file:
         file = file.read()
-        print file
+        file = float(file)
         variables.target_temp = float(round(file, 2))
 except IOError:
     with open("temp.conf", "w") as file:
