@@ -94,9 +94,8 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setup(hardware.heatpad_pin, GPIO.OUT)
 GPIO.setup(hardware.up_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 GPIO.setup(hardware.down_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-GPIO.setup(hardware.down_switch_pin, GPIO.OUT)
-GPIO.setup(hardware.manual_initiate_ota_update, GPIO.OUT)
-GPIO.setup(hardware.internet_indicator, GPIO.OUT)
+#GPIO.setup(hardware.manual_initiate_ota_update, GPIO.OUT)
+#GPIO.setup(hardware.internet_indicator, GPIO.OUT)
 
 # Test physical connections
 sensor(testing = 1)
