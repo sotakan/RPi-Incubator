@@ -38,7 +38,7 @@ class variables:
     kill_thread = False
 
 # Read sensor values and update corresponding data in class variables
-def sensor(testing = none):
+def sensor(testing = None):
     if testing == 1:
         try:
             temp,baro,humidity = bme280.readBME280All()
