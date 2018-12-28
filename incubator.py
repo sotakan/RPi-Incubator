@@ -62,8 +62,10 @@ def sensor(testing = None):
 def lcd(update = None, custom = False, message1 = None, message2 = None):
     if update == True:
         main_lcd(ln1 = str(variables.temp) + "C ;" + str(variables.humidity) + "%", ln2 = "Target: " + str(variables.target_temp) + "C")
+        return
     elif custom == True:
         main_lcd(ln1 = message1, ln2 = message2)
+        return
 
     while True:
         sensor()
