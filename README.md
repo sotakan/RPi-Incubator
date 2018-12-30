@@ -1,6 +1,8 @@
 # RPi-Incubator
 ## Use these schematics at your own risk!
 
+[日本語](https://github.com/sotakan/RPi-Incubator/blob/master/README_JP.md)
+
 ### Features:  
 Temperature Control  
 Humidity Display  
