@@ -1,15 +1,13 @@
 # RPi-Incubator
 ## Use these schematics at your own risk!
 
-
-Incubator controlled with a RaspberryPi
-
-Features:  
+### Features:  
 Temperature Control  
 Humidity Display
+Code is now legible  
 
-Todo:
-Data logging
+### Todo:
+Data logging  
 OTA updates
 
 Donations are appreciated!
