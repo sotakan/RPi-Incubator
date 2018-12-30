@@ -3,7 +3,7 @@
 
 ### Features:  
 Temperature Control  
-Humidity Display
+Humidity Display  
 Code is now legible  
 
 ### Todo:
