@@ -5,6 +5,7 @@
 Temperature Control  
 Humidity Display  
 Code is now legible  
+Automatically select I2C address for LCD
 
 ### Todo:
 Data logging  
