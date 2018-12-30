@@ -1,9 +1,11 @@
-#Ver 0.2dev 1
+#Ver 0.2dev 2
 import bme280
 import RPi.GPIO as GPIO
 import sys
 from threading import Thread
 import time
+import mysql.connector
+import pycurl
 
 
 # I2C LCDs ship with 2 different addresses depending on the lot
@@ -13,7 +15,7 @@ try:
     except IOError:
         from i2clcd_0x3f import main_lcd
 except Exception as e:
-    print "Error initializing LCD\nDetails:\n"
+    print("Error initializing LCD\nDetails:\n")
     sys.exit()
 
 class hardware:
@@ -43,8 +45,8 @@ def sensor(testing = none):
         try:
             temp,baro,humidity = bme280.readBME280All()
         except IOError as e:
-            print "Error initializing sensor\nDetails:\n"
-            print e
+            print("Error initializing sensor\nDetails:\n")
+            print(e)
             main_lcd(ln1 = "Init Error", ln2 = "Code 1")
             variables.kill_thread = True
             GPIO.cleanup()
@@ -72,6 +74,10 @@ def lcd(update = None, custom = False, message1 = None, message2 = None):
 
 # Support OTA updates in the future
 def ota():
+    pass
+
+# Future cloud function
+def fetch_settings():
     pass
 
 
@@ -149,7 +155,7 @@ except Exception as e:
     variables.kill_thread = True
     time.sleep(6)
     lcd(custom = True, message1 = "Incubator OFF", message2 = "Unkwn Error")
-    print "Error\nDetails:\n" , e
+    print("Error\nDetails:\n" , e)
     with open("temp.conf", "w") as file:
         file.write(str(variables.target_temp))
         file.close()

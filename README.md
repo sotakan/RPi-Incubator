@@ -6,14 +6,11 @@ Incubator controlled with a RaspberryPi
 
 Features:  
 Temperature Control  
-Humidity Control  
-
-Required libraries:
-[i2clcd](https://github.com/sotakan/i2clcd)
-BME280 (In this repository)
+Humidity Display
 
 Todo:
-Data logging  
+Data logging
+OTA updates
 
 Donations are appreciated!
 https://www.amazon.jp/gp/registry/wishlist/2O0N3CM3FQTD    
