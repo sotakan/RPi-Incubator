@@ -11,9 +11,11 @@ import pycurl
 # I2C LCDs ship with 2 different addresses depending on the lot
 try:
     try:
-        from i2clcd_0x27 import main_lcd
+        from i2clcd_0x27 import main_lcd, lcd_init
+        lcd_init()
     except IOError:
-        from i2clcd_0x3f import main_lcd
+        from i2clcd_0x3f import main_lcd, lcd_init
+        lcd_init()
 except Exception as e:
     print("Error initializing LCD\nDetails:\n")
     sys.exit()
@@ -40,7 +42,7 @@ class variables:
     kill_thread = False
 
 # Read sensor values and update corresponding data in class variables
-def sensor(testing = none):
+def sensor(testing = None):
     if testing == 1:
         try:
             temp,baro,humidity = bme280.readBME280All()
@@ -62,8 +64,10 @@ def sensor(testing = none):
 def lcd(update = None, custom = False, message1 = None, message2 = None):
     if update == True:
         main_lcd(ln1 = str(variables.temp) + "C ;" + str(variables.humidity) + "%", ln2 = "Target: " + str(variables.target_temp) + "C")
+        return
     elif custom == True:
         main_lcd(ln1 = message1, ln2 = message2)
+        return
 
     while True:
         sensor()
@@ -87,6 +91,7 @@ def fetch_settings():
 try:
     with open("temp.conf", "r+") as file:
         file = file.read()
+        file = float(file)
         variables.target_temp = float(round(file, 2))
 except IOError:
     with open("temp.conf", "w") as file:
@@ -100,9 +105,8 @@ GPIO.setmode(GPIO.BOARD)
 GPIO.setup(hardware.heatpad_pin, GPIO.OUT)
 GPIO.setup(hardware.up_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
 GPIO.setup(hardware.down_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
-GPIO.setup(hardware.down_switch_pin, GPIO.OUT)
-GPIO.setup(hardware.manual_initiate_ota_update, GPIO.OUT)
-GPIO.setup(hardware.internet_indicator, GPIO.OUT)
+#GPIO.setup(hardware.manual_initiate_ota_update, GPIO.OUT)
+#GPIO.setup(hardware.internet_indicator, GPIO.OUT)
 
 # Test physical connections
 sensor(testing = 1)
