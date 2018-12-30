@@ -1,91 +1,167 @@
+#Ver 0.2dev 2
 import bme280
 import RPi.GPIO as GPIO
-import i2clcd
-from sys import exit
-import threading
+import sys
+from threading import Thread
 import time
+import mysql.connector
+import pycurl
 
-# Change variables in this class to match your enviroment.
-class vars:
-    target_temp = 37.0
-    temp_offset = 0
-    heatpad_pin = 19
-    up_switch_pin = 11
-    down_switch_pin = 13
-    # Don't touch below
-    str_temp = ""
-    str_humid = ""
-    str_target = ""
-    STOP = 0 #Stop signal to send to looping threads
-    temp = 0
-    humid = 0
 
-def read_stat(): #Add any other sensors here
-    temp,baro,humidity = bme280.readBME280All()
-    return [temp,humidity]
-
-#To be used as a thread
-def update_lcd(): #This function will regulate the update interval to the lcd so it won't "blink"
+# I2C LCDs ship with 2 different addresses depending on the lot
+try:
     try:
-        while True:
-            if vars.STOP == 1:
-                exit()
-            vars.str_temp = str(vars.temp - vars.temp_offset) #The lcd won't take tuples so we will convert them using the str() function.
-            vars.str_humid = str(vars.humid)
-            i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
-            time.sleep(5)
-    except(IOError):
-        i2clcd.main_lcd(ln1 = "  LCD Error...", ln2 = "  Resetting...")
-        sleep(2)
+        from i2clcd_0x27 import main_lcd, lcd_init
+        lcd_init()
+    except IOError:
+        from i2clcd_0x3f import main_lcd, lcd_init
+        lcd_init()
+except Exception as e:
+    print("Error initializing LCD\nDetails:\n")
+    sys.exit()
 
-#Thread this thang
-def update_sensor(): #This will update the sensor every 5 secs to avoid IOError.
-    while True:
+class hardware:
+    # Hardware pins are numbered in BCM
+    heatpad_pin                = 19
+    up_switch_pin              = 11
+    down_switch_pin            = 13
+    error_light                = 17
+    internet_indicator         = 23
+    manual_initiate_ota_update = 27
+
+class variables:
+    # target_temp will be set at INIT from file
+    target_temp = None
+    # temp_offset is to eliminate any discrepancies between the sensor readings and actual readings in the box
+    temp_offset = 0.0
+    # temp and humidity are here because global is ew
+    temp        = 0.0
+    baro        = 0.0
+    humidity    = 0.0
+    # implement a kill signal for all looping threads
+    kill_thread = False
+
+# Read sensor values and update corresponding data in class variables
+def sensor(testing = None):
+    if testing == 1:
         try:
-            stat = read_stat() #stat will retrun as a tuple
-            vars.temp = float(round(stat[0], 2)) #Breaking down the tuples...
-            vars.humid = float(round(stat[1],2)) #Rounding the float to the 2nd place
-            time.sleep(5)
-            if vars.STOP == 1:
-                exit()
-        except(IOError):
-            print "Sensor error..."
-            i2clcd.main_lcd(ln1="  Sensor Error", ln2="  Resetting...")
-            sleep(2)
+            temp,baro,humidity = bme280.readBME280All()
+        except IOError as e:
+            print("Error initializing sensor\nDetails:\n")
+            print(e)
+            main_lcd(ln1 = "Init Error", ln2 = "Code 1")
+            variables.kill_thread = True
+            GPIO.cleanup()
+            sys.exit()
+    else:
+        temp,baro,humidity = bme280.readBME280All()
+        # Round values to the 2nd place
+        temp = float(round(temp , 2))
+        variables.humidity = float(round(humidity , 2))
+        # Process offset
+        variables.temp = temp - variables.temp_offset
 
+def lcd(update = None, custom = False, message1 = None, message2 = None):
+    if update == True:
+        main_lcd(ln1 = str(variables.temp) + "C ;" + str(variables.humidity) + "%", ln2 = "Target: " + str(variables.target_temp) + "C")
+        return
+    elif custom == True:
+        main_lcd(ln1 = message1, ln2 = message2)
+        return
+
+    while True:
+        sensor()
+        main_lcd(ln1 = str(variables.temp) + "C ;" + str(variables.humidity) + "%", ln2 = "Target: " + str(variables.target_temp) + "C")
+        time.sleep(5)
+        if variables.kill_thread == True:
+            return
+
+# Support OTA updates in the future
+def ota():
+    pass
+
+# Future cloud function
+def fetch_settings():
+    pass
+
+
+# INIT
+
+# Read temp file for target temp
+try:
+    with open("temp.conf", "r+") as file:
+        file = file.read()
+        file = float(file)
+        variables.target_temp = float(round(file, 2))
+except IOError:
+    with open("temp.conf", "w") as file:
+        file.write("37.0")
+        variables.target_temp = 37.0
+        file.close()
+
+
+# GPIOs
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(vars.heatpad_pin, GPIO.OUT)
-GPIO.setup(vars.up_switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-GPIO.setup(vars.down_switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+GPIO.setup(hardware.heatpad_pin, GPIO.OUT)
+GPIO.setup(hardware.up_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+GPIO.setup(hardware.down_switch_pin, GPIO.IN, pull_up_down = GPIO.PUD_DOWN)
+#GPIO.setup(hardware.manual_initiate_ota_update, GPIO.OUT)
+#GPIO.setup(hardware.internet_indicator, GPIO.OUT)
 
-threading.Thread(target=update_lcd).start()
-threading.Thread(target=update_sensor).start()
-stat = read_stat()
-vars.temp = float(round(stat[0], 2))
+# Test physical connections
+sensor(testing = 1)
+
+# Thread LCD
+lcd_thread = Thread(target = lcd , args = ())
+lcd_thread.daemon = True
+lcd_thread.start()
+
+# Wait for sensor to load
+time.sleep(2)
+
+# Main
 
 try:
     while True:
-        if GPIO.input(vars.up_switch_pin) == 1:
-            vars.target_temp = vars.target_temp + 0.1
-            vars.str_target = str(vars.target_temp - vars.temp_offset)
-            i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
-        elif GPIO.input(vars.down_switch_pin) == 1:
-            vars.target_temp = vars.target_temp - 0.1
-            vars.str_target = str(vars.target_temp - vars.temp_offset)
-            i2clcd.main_lcd(ln1 = "Temp:" + vars.str_temp, ln2 = "Target:" + vars.str_target)
-        if vars.temp < vars.target_temp:
-            GPIO.output(vars.heatpad_pin,1)
-        elif vars.temp > vars.target_temp:
-            GPIO.output(vars.heatpad_pin,0)
+        if GPIO.input(hardware.up_switch_pin) == 1:
+            variables.target_temp = variables.target_temp + 0.1
+            lcd(update = True)
+        elif GPIO.input(hardware.down_switch_pin) == 1:
+            variables.target_temp = variables.target_temp - 0.1
+            lcd(update = True)
 
-except():
-    i2clcd.main_lcd(ln1 = "Incubator off", ln2 = "Error")
-    vars.STOP = 1
-    GPIO.cleanup()
-    exit()
+        if variables.temp > variables.target_temp:
+            GPIO.output(hardware.heatpad_pin, 0)
+        elif variables.temp < variables.target_temp:
+            GPIO.output(hardware.heatpad_pin, 1)
 
-except(KeyboardInterrupt):
-    i2clcd.main_lcd(ln1 = "Incubator off", ln2 = "KeyboardInterrpt")
-    vars.STOP = 1
+except KeyboardInterrupt:
+    variables.kill_thread = True
+    time.sleep(6)
+    lcd(custom = True, message1 = "Incubator OFF", message2 = "Manual shutdown")
+    with open("temp.conf", "w") as file:
+        file.write(str(variables.target_temp))
+        file.close()
     GPIO.cleanup()
-    exit()
+    sys.exit()
+
+except IOError:
+    variables.kill_thread = True
+    time.sleep(6)
+    lcd(custom = True, message1 = "Incubator OFF", message2 = "IOError")
+    with open("temp.conf", "w") as file:
+        file.write(str(variables.target_temp))
+        file.close()
+    GPIO.cleanup()
+    sys.exit()
+
+except Exception as e:
+    variables.kill_thread = True
+    time.sleep(6)
+    lcd(custom = True, message1 = "Incubator OFF", message2 = "Unkwn Error")
+    print("Error\nDetails:\n" , e)
+    with open("temp.conf", "w") as file:
+        file.write(str(variables.target_temp))
+        file.close()
+    GPIO.cleanup()
+    sys.exit()
