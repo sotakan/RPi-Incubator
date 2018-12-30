@@ -2,9 +2,7 @@
 
 #Installs software
 echo "Installing dependencies"
-sudo apt-get update && sudo apt-get install -y git i2c-tools python-smbus mysql.connector python-pycurl | echo "Download Success!"
-echo "Cloning git repository"
-git clone https://github.com/sotakan/RPi-Incubator.git
+sudo apt-get update && sudo apt-get install -y i2c-tools python-smbus mysql.connector python-pycurl | echo "Download Success!"
 
 # Enable I2C
 echo "Editing /boot/config.txt to enable I2C"
