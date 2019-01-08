@@ -89,7 +89,7 @@ def fetch_settings():
     pass
 
 # Future cloud logging
-def cloud_register():
+def cloud_push_data():
     pass
 
 
