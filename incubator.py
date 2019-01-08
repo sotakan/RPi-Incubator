@@ -80,14 +80,22 @@ def lcd(update = None, custom = False, message1 = None, message2 = None):
 def ota():
     pass
 
+# Future cloud registration function
+def cloud_register():
+    pass
+
 # Future cloud function
 def fetch_settings():
+    pass
+
+# Future cloud logging
+def cloud_register():
     pass
 
 
 # INIT
 
-# Read temp file for target temp
+# Read temp file for target temp TODO: use configparser
 try:
     with open("temp.conf", "r+") as file:
         file = file.read()
@@ -137,7 +145,7 @@ try:
 
 except KeyboardInterrupt:
     variables.kill_thread = True
-    time.sleep(6)
+    lcd_thread.join()
     lcd(custom = True, message1 = "Incubator OFF", message2 = "Manual shutdown")
     with open("temp.conf", "w") as file:
         file.write(str(variables.target_temp))
@@ -147,7 +155,7 @@ except KeyboardInterrupt:
 
 except IOError:
     variables.kill_thread = True
-    time.sleep(6)
+    lcd_thread.join()
     lcd(custom = True, message1 = "Incubator OFF", message2 = "IOError")
     with open("temp.conf", "w") as file:
         file.write(str(variables.target_temp))
@@ -157,7 +165,7 @@ except IOError:
 
 except Exception as e:
     variables.kill_thread = True
-    time.sleep(6)
+    lcd_thread.join()
     lcd(custom = True, message1 = "Incubator OFF", message2 = "Unkwn Error")
     print("Error\nDetails:\n" , e)
     with open("temp.conf", "w") as file:
