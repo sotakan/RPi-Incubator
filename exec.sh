@@ -2,5 +2,5 @@
 
 while true
 do
-	python $PWD/incubator.sh
+	python $PWD/incubator.py
 done
