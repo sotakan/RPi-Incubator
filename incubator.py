@@ -17,7 +17,7 @@ try:
         from i2clcd_0x3f import main_lcd, lcd_init
         lcd_init()
 except Exception as e:
-    print("Error initializing LCD\nDetails:\n")
+    print("Error initializing LCD\nDetails:\n%s" % e)
     sys.exit()
 
 class hardware:
