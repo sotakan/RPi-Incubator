@@ -4,8 +4,8 @@ import RPi.GPIO as GPIO
 import sys
 from threading import Thread
 import time
-import mysql.connector
-import pycurl
+# import mysql.connector
+# import pycurl
 
 
 # I2C LCDs ship with 2 different addresses depending on the lot
